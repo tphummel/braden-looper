@@ -1,4 +1,6 @@
-addEventListener("fetch", event => { // eslint-disable-line
+import { move } from './move.js'
+
+addEventListener('fetch', event => { // eslint-disable-line
   event.respondWith(handleRequest(event.request))
 })
 
@@ -34,6 +36,8 @@ async function handleRequest (request) {
     console.log('POST /start')
     console.log(new Map(request.headers))
 
+    // const reqBody = await request.text()
+
     // no response required
     return new Response('OK', { status: 200 }) // eslint-disable-line
 
@@ -41,19 +45,18 @@ async function handleRequest (request) {
     console.log('POST /move')
     console.log(new Map(request.headers))
 
-    const body = {
-      move: 'up',
-      shout: 'shout'
-    }
+    const reqBody = await request.text()
 
-    return new Response(JSON.stringify(body), { // eslint-disable-line
+    const resBody = move(reqBody)
+
+    return new Response(JSON.stringify(resBody), { // eslint-disable-line
       status: 200,
       headers: {
         'content-type': 'application/json;charset=UTF-8'
       }
     })
   } else if (pathname.startsWith('/end')) {
-    console.log('POST /move')
+    console.log('POST /end')
     console.log(new Map(request.headers))
 
     // no response required
