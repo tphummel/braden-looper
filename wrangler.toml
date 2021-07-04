@@ -1,0 +1,8 @@
+name = "battlesnake"
+type = 'webpack'
+account_id = '7936a19a39b0aae1d9d9a29358969e04'
+route = 'https://battlesnake.tomhummel.com/*'
+zone_id = '416e9ed3614707fb2e3ae8af726be325'
+usage_model = ''
+workers_dev = false
+webpack_config = "webpack.config.js"
