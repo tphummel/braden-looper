@@ -1,5 +1,5 @@
-import assert from 'assert'
-import { move } from './move.js'
+const assert = require('assert')
+const { move } = require('./index.js')
 
 const validMoves = ['up', 'down', 'left', 'right']
 

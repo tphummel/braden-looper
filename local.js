@@ -1,5 +1,5 @@
-import http from 'http'
-import { move } from './move.js'
+const http = require('http')
+const { move } = require('./index.js')
 
 const server = http.createServer((req, res) => {
   const pathname = req.url
