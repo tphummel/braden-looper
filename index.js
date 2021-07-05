@@ -9,7 +9,9 @@ function move (reqBody) {
   return body
 }
 
-if (typeof addEventListener !== 'undefined' && addEventListener) { // eslint-disable-line
+const isCloudFlareWorker = typeof addEventListener !== 'undefined' && addEventListener // eslint-disable-line
+
+if (isCloudFlareWorker) {
   addEventListener('fetch', event => { // eslint-disable-line
     event.respondWith(handleRequest(event.request))
   })
