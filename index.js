@@ -1,12 +1,18 @@
 function move (reqBody) {
   console.log(reqBody)
 
-  const body = {
-    move: 'up',
-    shout: 'shout'
+  const { board, you } = reqBody
+  const shout = 'shout'
+  let move
+
+  const atNorthWall = you.head.y + 1 === board.height
+  if (atNorthWall) {
+    move = 'left'
+  } else {
+    move = 'up'
   }
 
-  return body
+  return { move, shout }
 }
 
 const isCloudFlareWorker = typeof addEventListener !== 'undefined' && addEventListener // eslint-disable-line
