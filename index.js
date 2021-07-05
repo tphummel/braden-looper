@@ -1,16 +1,48 @@
 function move (reqBody) {
-  console.log(reqBody)
 
   const { board, you } = reqBody
+
   const shout = 'shout'
   let move
 
+  const prev = you.body[1]
+
+  const movingNorth = prev.y === you.head.y - 1
+  const movingSouth = prev.y === you.head.y + 1
+  const movingEast = prev.x === you.head.x - 1
+  const movingWest = prev.x === you.head.x + 1
+
   const atNorthWall = you.head.y + 1 === board.height
-  if (atNorthWall) {
-    move = 'left'
+  const atWestWall = you.head.x === 0
+  const atNorthWestCorner = atNorthWall && atWestWall
+
+  if (atNorthWestCorner) {
+    if (movingNorth) {
+      move = 'right'
+    } else if (movingWest) {
+      move = 'down'
+    }
+  } else if (atNorthWall) {
+    if (movingWest) {
+      move = 'left'
+    } else if (movingEast) {
+      move = 'right'
+    } else if (movingNorth) {
+      move = 'left'
+    }
+  } else if (atWestWall) {
+    if (movingNorth) {
+      move = 'up'
+    } else if (movingSouth) {
+      move = 'down'
+    } else if (movingWest) {
+      move = 'up'
+    }
   } else {
     move = 'up'
   }
+
+  console.log('move:', move)
 
   return { move, shout }
 }
