@@ -103,7 +103,8 @@ if (isCloudFlareWorker) {
       console.log('POST /move')
       console.log(new Map(request.headers))
 
-      const reqBody = await request.text()
+      const reqBodyTxt = await request.text()
+      const reqBody = JSON.parse(reqBodyTxt)
 
       const resBody = move(reqBody)
 
