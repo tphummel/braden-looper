@@ -149,7 +149,7 @@ if (isCloudFlareWorker) {
       // no response required
       return new Response('OK', { status: 200 }) // eslint-disable-line
     } else {
-      return Response('Not Found', { status: 404 }) // eslint-disable-line
+      return new Response('Not Found', { status: 404 }) // eslint-disable-line
     }
   }
 } else {
