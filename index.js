@@ -46,6 +46,14 @@ function move (reqBody) {
     } else if (movingWest) {
       move = 'up'
     }
+  } else if (atSouthWall) {
+    if (movingWest) {
+      move = 'left'
+    } else if (movingEast) {
+      move = 'right'
+    } else if (movingSouth) {
+      move = 'right'
+    }
   } else {
     move = 'up'
   }

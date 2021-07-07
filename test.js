@@ -134,3 +134,28 @@ tap.test('avoid hitting the southwest corner', function (t) {
 
   t.end()
 })
+
+tap.test('avoid hitting the south wall', function (t) {
+  const game = {
+    board: {
+      height: 11,
+      width: 11
+    },
+    you: {
+      head: {
+        x: 5,
+        y: 0
+      },
+      body: [
+        { x: 5, y: 0 },
+        { x: 5, y: 1 },
+        { x: 5, y: 2 }
+      ]
+    }
+  }
+
+  const result = move(game)
+  const note = 'move left or right when you hit south wall head on'
+  t.ok(result.move === 'left' || result.move === 'right', note)
+  t.end()
+})
