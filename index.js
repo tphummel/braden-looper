@@ -19,22 +19,6 @@ function move (reqBody) {
   const atSouthWestCorner = atSouthWall && atWestWall
   const atSouthEastCorner = atSouthWall && atEastWall
 
-  if (process.env.DEBUG) {
-    console.table({
-      movingNorth,
-      movingWest,
-      movingEast,
-      movingSouth,
-      atNorthWall,
-      atWestWall,
-      atSouthWall,
-      atEastWall,
-      atNorthWestCorner,
-      atSouthWestCorner,
-      atSouthEastCorner
-    })
-  }
-
   if (atNorthWestCorner) {
     if (movingNorth) {
       move = 'right'
@@ -80,8 +64,6 @@ function move (reqBody) {
   } else {
     move = 'up'
   }
-
-  if (process.env.DEBUG) console.log('move:', move)
 
   return { move, shout }
 }

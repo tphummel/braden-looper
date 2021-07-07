@@ -40,7 +40,10 @@ const server = http.createServer((req, res) => {
 
     req.on('end', () => {
       const reqBody = JSON.parse(data)
+      if (process.env.DEBUG) console.log(reqBody)
       const resBody = move(reqBody)
+      if (process.env.DEBUG) console.log(resBody)
+
       res.writeHead(200, {
         'content-type': 'application/json;charset=UTF-8'
       })
