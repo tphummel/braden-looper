@@ -74,7 +74,7 @@ if (isCloudFlareWorker) {
         author: 'tphummel',
         color: '#888888',
         head: 'default',
-        tail: 'default',
+        tail: 'rattle',
         version: '0.0.1-beta'
       }
 
