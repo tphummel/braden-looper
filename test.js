@@ -159,3 +159,29 @@ tap.test('avoid hitting the south wall', function (t) {
   t.ok(result.move === 'left' || result.move === 'right', note)
   t.end()
 })
+
+tap.test('avoid hitting the southeast corner, eastbound', function (t) {
+  const game = {
+    board: {
+      height: 11,
+      width: 11
+    },
+    you: {
+      head: {
+        x: 10,
+        y: 0
+      },
+      body: [
+        { x: 10, y: 0 },
+        { x: 9, y: 0 },
+        { x: 8, y: 0 }
+      ]
+    }
+  }
+
+  const expected = 'up'
+  const result = move(game)
+  t.equal(result.move, expected)
+
+  t.end()
+})

@@ -14,9 +14,11 @@ function move (reqBody) {
 
   const atNorthWall = you.head.y + 1 === board.height
   const atWestWall = you.head.x === 0
+  const atEastWall = you.head.x + 1 === board.width
   const atSouthWall = you.head.y === 0
   const atNorthWestCorner = atNorthWall && atWestWall
   const atSouthWestCorner = atSouthWall && atWestWall
+  const atSouthEastCorner = atSouthWall && atEastWall
 
   if (atNorthWestCorner) {
     if (movingNorth) {
@@ -28,6 +30,12 @@ function move (reqBody) {
     if (movingSouth) {
       move = 'right'
     } else if (movingWest) {
+      move = 'up'
+    }
+  } else if (atSouthEastCorner) {
+    if (movingSouth) {
+      move = 'left'
+    } else if (movingEast) {
       move = 'up'
     }
   } else if (atNorthWall) {
