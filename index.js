@@ -18,6 +18,7 @@ function move (reqBody) {
   const atNorthWestCorner = atNorthWall && atWestWall
   const atSouthWestCorner = atSouthWall && atWestWall
   const atSouthEastCorner = atSouthWall && atEastWall
+  const atNorthEastCorner = atNorthWall && atEastWall
 
   if (atNorthWestCorner) {
     if (movingNorth) {
@@ -36,6 +37,12 @@ function move (reqBody) {
       move = 'left'
     } else if (movingEast) {
       move = 'up'
+    }
+  } else if (atNorthEastCorner) {
+    if (movingNorth) {
+      move = 'left'
+    } else if (movingEast) {
+      move = 'down'
     }
   } else if (atNorthWall) {
     if (movingWest) {
@@ -60,6 +67,14 @@ function move (reqBody) {
       move = 'right'
     } else if (movingSouth) {
       move = 'right'
+    }
+  } else if (atEastWall) {
+    if (movingSouth) {
+      move = 'down'
+    } else if (movingNorth) {
+      move = 'up'
+    } else if (movingEast) {
+      move = 'up'
     }
   } else {
     move = 'up'
@@ -88,7 +103,7 @@ if (isCloudFlareWorker) {
         color: '#888888',
         head: 'default',
         tail: 'rattle',
-        version: '0.0.1-beta'
+        version: '2021-07-07'
       }
 
       return new Response(JSON.stringify(body), { // eslint-disable-line

@@ -185,3 +185,81 @@ tap.test('avoid hitting the southeast corner, eastbound', function (t) {
 
   t.end()
 })
+
+tap.test('survive the northeast corner, northbound', function (t) {
+  const game = {
+    board: {
+      height: 11,
+      width: 11
+    },
+    you: {
+      head: {
+        x: 10,
+        y: 10
+      },
+      body: [
+        { x: 10, y: 10 },
+        { x: 10, y: 9 },
+        { x: 10, y: 8 }
+      ]
+    }
+  }
+
+  const expected = 'left'
+  const result = move(game)
+  t.equal(result.move, expected)
+
+  t.end()
+})
+
+tap.test('avoid hitting the northeast corner, eastbound', function (t) {
+  const game = {
+    board: {
+      height: 11,
+      width: 11
+    },
+    you: {
+      head: {
+        x: 10,
+        y: 10
+      },
+      body: [
+        { x: 10, y: 10 },
+        { x: 9, y: 10 },
+        { x: 8, y: 10 }
+      ]
+    }
+  }
+
+  const expected = 'down'
+  const result = move(game)
+  t.equal(result.move, expected)
+
+  t.end()
+})
+
+tap.test('avoid hitting the east wall, southbound', function (t) {
+  const game = {
+    board: {
+      height: 11,
+      width: 11
+    },
+    you: {
+      head: {
+        x: 10,
+        y: 9
+      },
+      body: [
+        { x: 10, y: 9 },
+        { x: 10, y: 10 },
+        { x: 9, y: 10 }
+      ]
+    }
+  }
+
+  const expected = 'down'
+  const result = move(game)
+  t.equal(result.move, expected)
+
+  t.end()
+})
