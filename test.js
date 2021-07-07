@@ -109,7 +109,7 @@ tap.test('avoid hitting the northwest corner', function (t) {
   t.end()
 })
 
-tap.test('avoid hitting the southwest corner', function (t) {
+tap.test('avoid hitting the southwest corner, southbound', function (t) {
   const game = {
     board: {
       height: 11,
