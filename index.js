@@ -101,7 +101,7 @@ if (isCloudFlareWorker) {
         apiversion: '1',
         author: 'tphummel',
         color: '#888888',
-        head: 'default',
+        head: 'viper',
         tail: 'rattle',
         version: '2021-07-07'
       }
