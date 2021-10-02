@@ -87,6 +87,12 @@ const isCloudFlareWorker = typeof addEventListener !== 'undefined' && addEventLi
 
 if (isCloudFlareWorker) {
   addEventListener('fetch', event => { // eslint-disable-line
+    const someEvent = {
+      type: 'page-load',
+      battlesnake: true
+    }
+
+    event.waitUntil(postLog(someEvent))
     event.respondWith(handleRequest(event.request))
   })
 
@@ -151,6 +157,15 @@ if (isCloudFlareWorker) {
     } else {
       return new Response('Not Found', { status: 404 }) // eslint-disable-line
     }
+  }
+
+  function postLog (data) {
+    console.log('sending event to honeycomb')
+    return fetch('https://api.honeycomb.io/1/events/' + encodeURIComponent(HONEYCOMB_DATASET), { // eslint-disable-line
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: new Headers([['X-Honeycomb-Team', HONEYCOMB_KEY]]) // eslint-disable-line
+    })
   }
 } else {
   module.exports = { move }
