@@ -87,13 +87,21 @@ const isCloudFlareWorker = typeof addEventListener !== 'undefined' && addEventLi
 
 if (isCloudFlareWorker) {
   addEventListener('fetch', event => { // eslint-disable-line
+    const resp = handleRequest(event.request)
+    const respBody = JSON.parse(resp.body)
+
+    const { pathname } = new URL(event.request.url)
+
     const someEvent = {
       type: 'page-load',
-      battlesnake: true
+      req_method: event.request.method,
+      req_pathname: pathname,
+      res_status: resp.status,
+      res_move: respBody?.move
     }
 
     event.waitUntil(postLog(someEvent))
-    event.respondWith(handleRequest(event.request))
+    event.respondWith(resp)
   })
 
   async function handleRequest (request) {
