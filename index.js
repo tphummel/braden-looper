@@ -87,25 +87,32 @@ const isCloudFlareWorker = typeof addEventListener !== 'undefined' && addEventLi
 
 if (isCloudFlareWorker) {
   addEventListener('fetch', event => { // eslint-disable-line
-    const resp = handleRequest(event.request)
-    // const respBody = JSON.parse(resp.body)
-
-    const { pathname } = new URL(event.request.url)
-
-    const someEvent = {
-      type: 'page-load',
-      req_method: event.request.method,
-      req_pathname: pathname,
-      res_status: resp.status,
-      // res_move: respBody?.move
-    }
-
-    event.waitUntil(postLog(someEvent))
-    event.respondWith(resp)
+    event.respondWith(handleRequest(event))
   })
 
-  async function handleRequest (request) {
+  async function handleRequest (event) {
+    const { request } = event
     const { pathname } = new URL(request.url)
+    const cf = event.request.cf !== undefined ? event.request.cf : {}
+    const headers = new Map(request.headers)
+
+    const eventData = {
+      battlesnake: BATTLESNAKE_NAME, // eslint-disable-line
+      req_method: event.request.method,
+      req_pathname: pathname,
+      req_lat: cf.latitude,
+      req_lon: cf.longitude,
+      req_continent: cf.continent,
+      req_country: cf.country,
+      req_region: cf.region,
+      req_city: cf.city,
+      req_timezone: cf.timezone,
+      req_region_code: cf.regionCode,
+      req_metro_code: cf.metroCode,
+      req_postal_code: cf.postalCode,
+      req_colo: cf.colo,
+      req_cf_ray: headers.get('cf-ray')
+    }
 
     if (request.method === 'GET') {
       console.log('GET /')
@@ -120,6 +127,8 @@ if (isCloudFlareWorker) {
         version: '2021-07-07'
       }
 
+      event.waitUntil(postLog(eventData))
+
       return new Response(JSON.stringify(body), { // eslint-disable-line
         status: 200,
         headers: {
@@ -129,6 +138,7 @@ if (isCloudFlareWorker) {
     }
 
     if (request.method !== 'POST') {
+      event.waitUntil(postLog(eventData))
       return new Response('Not Found', { status: 404 }) // eslint-disable-line
     }
 
@@ -139,6 +149,7 @@ if (isCloudFlareWorker) {
       // const reqBody = await request.text()
 
       // no response required
+      event.waitUntil(postLog(eventData))
       return new Response('OK', { status: 200 }) // eslint-disable-line
 
     } else if (pathname.startsWith('/move')) {
@@ -149,6 +160,8 @@ if (isCloudFlareWorker) {
       const reqBody = JSON.parse(reqBodyTxt)
 
       const resBody = move(reqBody)
+
+      event.waitUntil(postLog(eventData))
 
       return new Response(JSON.stringify(resBody), { // eslint-disable-line
         status: 200,
@@ -161,8 +174,10 @@ if (isCloudFlareWorker) {
       console.log(new Map(request.headers))
 
       // no response required
+      event.waitUntil(postLog(eventData))
       return new Response('OK', { status: 200 }) // eslint-disable-line
     } else {
+      event.waitUntil(postLog(eventData))
       return new Response('Not Found', { status: 404 }) // eslint-disable-line
     }
   }
