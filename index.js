@@ -213,6 +213,30 @@ if (isCloudFlareWorker) {
       console.log('POST /end')
       console.log(new Map(request.headers))
 
+      const reqBodyTxt = await request.text()
+      const reqBody = JSON.parse(reqBodyTxt)
+
+      eventData.game_id = reqBody.game.id
+      eventData.game_timeout = reqBody.game.timeout
+      eventData.game_source = reqBody.game.source
+      eventData.ruleset_name = reqBody.game.ruleset.name
+      eventData.ruleset_version = reqBody.game.ruleset.version
+      eventData.turn = reqBody.turn
+      eventData.board_height = reqBody.board.height
+      eventData.board_width = reqBody.board.width
+      eventData.board_food_count = reqBody.board.food.length
+      eventData.board_hazard_count = reqBody.board.hazards.length
+      eventData.board_snakes_count = reqBody.board.snakes.length
+      eventData.you_id = reqBody.you.id
+      eventData.you_name = reqBody.you.name
+      eventData.you_health = reqBody.you.health
+      eventData.you_length = reqBody.you.length
+      eventData.you_shout = reqBody.you.shout
+      eventData.you_squad = reqBody.you.squad
+      eventData.you_latency = reqBody.you.latency
+      eventData.you_head_x = reqBody.you.head.x
+      eventData.you_head_y = reqBody.you.head.y
+
       // no response required
       event.waitUntil(postLog(eventData))
       return new Response('OK', { status: 200 }) // eslint-disable-line
