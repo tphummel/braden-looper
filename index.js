@@ -88,7 +88,7 @@ const isCloudFlareWorker = typeof addEventListener !== 'undefined' && addEventLi
 if (isCloudFlareWorker) {
   addEventListener('fetch', event => { // eslint-disable-line
     const resp = handleRequest(event.request)
-    const respBody = JSON.parse(resp.body)
+    // const respBody = JSON.parse(resp.body)
 
     const { pathname } = new URL(event.request.url)
 
@@ -97,7 +97,7 @@ if (isCloudFlareWorker) {
       req_method: event.request.method,
       req_pathname: pathname,
       res_status: resp.status,
-      res_move: respBody?.move
+      // res_move: respBody?.move
     }
 
     event.waitUntil(postLog(someEvent))
