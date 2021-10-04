@@ -153,10 +153,10 @@ if (isCloudFlareWorker) {
       return res
     }
 
-    if (pathname.startsWith('/start')) {
-      const reqBodyTxt = await request.text()
-      const reqBody = JSON.parse(reqBodyTxt)
+    const reqBodyTxt = await request.text()
+    const reqBody = JSON.parse(reqBodyTxt)
 
+    if (pathname.startsWith('/start')) {
       eventData.game_id = reqBody.game.id
       eventData.game_timeout = reqBody.game.timeout
       eventData.turn = reqBody.turn
@@ -181,9 +181,6 @@ if (isCloudFlareWorker) {
       event.waitUntil(postLog(eventData))
       return res
     } else if (pathname.startsWith('/move')) {
-      const reqBodyTxt = await request.text()
-      const reqBody = JSON.parse(reqBodyTxt)
-
       eventData.game_id = reqBody.game.id
       eventData.game_timeout = reqBody.game.timeout
       eventData.turn = reqBody.turn
@@ -218,9 +215,6 @@ if (isCloudFlareWorker) {
 
       return res
     } else if (pathname.startsWith('/end')) {
-      const reqBodyTxt = await request.text()
-      const reqBody = JSON.parse(reqBodyTxt)
-
       eventData.game_id = reqBody.game.id
       eventData.game_timeout = reqBody.game.timeout
       eventData.game_source = reqBody.game.source
