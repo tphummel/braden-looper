@@ -114,7 +114,7 @@ if (isCloudFlareWorker) {
     event.respondWith(handleRequest(event))
   })
 
-  function mergeReqEvent(eventData, reqBody) {
+  function mergeReqEvent (eventData, reqBody) {
     eventData.game_id = reqBody.game.id
     eventData.game_timeout = reqBody.game.timeout
     eventData.game_source = reqBody.game?.source
@@ -144,8 +144,7 @@ if (isCloudFlareWorker) {
     const { pathname } = new URL(request.url)
 
     console.log(request.method, request.pathname)
-
-    const eventData = getEventData(event)
+    let eventData = getEventData(event)
 
     if (request.method === 'GET') {
       console.log(new Map(request.headers))
@@ -181,40 +180,30 @@ if (isCloudFlareWorker) {
     const reqBodyTxt = await request.text()
     const reqBody = JSON.parse(reqBodyTxt)
     eventData = mergeReqEvent(eventData, reqBody)
+    let res
 
     if (pathname.startsWith('/start')) {
-      const res = new Response('OK', { status: 200 }) // eslint-disable-line
-      eventData.res_status = res.status
-      event.waitUntil(postLog(eventData))
-      return res
-
+      res = new Response('OK', { status: 200 }) // eslint-disable-line
     } else if (pathname.startsWith('/move')) {
       const resBody = move(reqBody)
-
       eventData.res_move = resBody.move
       eventData.res_shout = resBody.shout
 
-      const res = new Response(JSON.stringify(resBody), { // eslint-disable-line
+      res = new Response(JSON.stringify(resBody), { // eslint-disable-line
         status: 200,
         headers: {
           'content-type': 'application/json;charset=UTF-8'
         }
       })
-      
-      eventData.res_status = res.status
-      event.waitUntil(postLog(eventData))
-      return res
     } else if (pathname.startsWith('/end')) {
-      const res = new Response('OK', { status: 200 }) // eslint-disable-line
-      eventData.res_status = res.status
-      event.waitUntil(postLog(eventData))
-      return res
+      res = new Response('OK', { status: 200 }) // eslint-disable-line
     } else {
-      const res = new Response('Not Found', { status: 404 }) // eslint-disable-line
-      eventData.res_status = res.status
-      event.waitUntil(postLog(eventData))
-      return res
+      res = new Response('Not Found', { status: 404 }) // eslint-disable-line
     }
+
+    eventData.res_status = res.status
+    event.waitUntil(postLog(eventData))
+    return res
   }
 } else {
   module.exports = { move }
