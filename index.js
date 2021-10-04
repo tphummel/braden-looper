@@ -114,6 +114,31 @@ if (isCloudFlareWorker) {
     event.respondWith(handleRequest(event))
   })
 
+  function mergeReqEvent(eventData, reqBody) {
+    eventData.game_id = reqBody.game.id
+    eventData.game_timeout = reqBody.game.timeout
+    eventData.game_source = reqBody.game?.source
+    eventData.ruleset_name = reqBody.game?.ruleset?.name
+    eventData.ruleset_version = reqBody.game?.ruleset?.version
+    eventData.turn = reqBody.turn
+    eventData.board_height = reqBody.board.height
+    eventData.board_width = reqBody.board.width
+    eventData.board_food_count = reqBody.board.food?.length
+    eventData.board_hazard_count = reqBody.board.hazards?.length
+    eventData.board_snakes_count = reqBody.board.snakes?.length
+    eventData.you_id = reqBody.you.id
+    eventData.you_name = reqBody.you.name
+    eventData.you_health = reqBody.you.health
+    eventData.you_length = reqBody.you.length
+    eventData.you_shout = reqBody.you.shout
+    eventData.you_squad = reqBody.you.squad
+    eventData.you_latency = reqBody.you.latency
+    eventData.you_head_x = reqBody.you.head.x
+    eventData.you_head_y = reqBody.you.head.y
+
+    return eventData
+  }
+
   async function handleRequest (event) {
     const { request } = event
     const { pathname } = new URL(request.url)
@@ -155,50 +180,15 @@ if (isCloudFlareWorker) {
 
     const reqBodyTxt = await request.text()
     const reqBody = JSON.parse(reqBodyTxt)
+    eventData = mergeReqEvent(eventData, reqBody)
 
     if (pathname.startsWith('/start')) {
-      eventData.game_id = reqBody.game.id
-      eventData.game_timeout = reqBody.game.timeout
-      eventData.turn = reqBody.turn
-      eventData.board_height = reqBody.board.height
-      eventData.board_width = reqBody.board.width
-      eventData.board_food_count = reqBody.board.food.length
-      eventData.board_hazard_count = reqBody.board.hazards.length
-      eventData.board_snakes_count = reqBody.board.snakes.length
-      eventData.you_id = reqBody.you.id
-      eventData.you_name = reqBody.you.name
-      eventData.you_health = reqBody.you.health
-      eventData.you_length = reqBody.you.length
-      eventData.you_shout = reqBody.you.shout
-      eventData.you_squad = reqBody.you.squad
-      eventData.you_latency = reqBody.you.latency
-      eventData.you_head_x = reqBody.you.head.x
-      eventData.you_head_y = reqBody.you.head.y
-
-      // no response required
       const res = new Response('OK', { status: 200 }) // eslint-disable-line
       eventData.res_status = res.status
       event.waitUntil(postLog(eventData))
       return res
-    } else if (pathname.startsWith('/move')) {
-      eventData.game_id = reqBody.game.id
-      eventData.game_timeout = reqBody.game.timeout
-      eventData.turn = reqBody.turn
-      eventData.board_height = reqBody.board.height
-      eventData.board_width = reqBody.board.width
-      eventData.board_food_count = reqBody.board.food.length
-      eventData.board_hazard_count = reqBody.board.hazards.length
-      eventData.board_snakes_count = reqBody.board.snakes.length
-      eventData.you_id = reqBody.you.id
-      eventData.you_name = reqBody.you.name
-      eventData.you_health = reqBody.you.health
-      eventData.you_length = reqBody.you.length
-      eventData.you_shout = reqBody.you.shout
-      eventData.you_squad = reqBody.you.squad
-      eventData.you_latency = reqBody.you.latency
-      eventData.you_head_x = reqBody.you.head.x
-      eventData.you_head_y = reqBody.you.head.y
 
+    } else if (pathname.startsWith('/move')) {
       const resBody = move(reqBody)
 
       eventData.res_move = resBody.move
@@ -210,36 +200,14 @@ if (isCloudFlareWorker) {
           'content-type': 'application/json;charset=UTF-8'
         }
       })
+      
       eventData.res_status = res.status
       event.waitUntil(postLog(eventData))
-
       return res
     } else if (pathname.startsWith('/end')) {
-      eventData.game_id = reqBody.game.id
-      eventData.game_timeout = reqBody.game.timeout
-      eventData.game_source = reqBody.game.source
-      eventData.ruleset_name = reqBody.game.ruleset.name
-      eventData.ruleset_version = reqBody.game.ruleset.version
-      eventData.turn = reqBody.turn
-      eventData.board_height = reqBody.board.height
-      eventData.board_width = reqBody.board.width
-      eventData.board_food_count = reqBody.board.food.length
-      eventData.board_hazard_count = reqBody.board.hazards.length
-      eventData.board_snakes_count = reqBody.board.snakes.length
-      eventData.you_id = reqBody.you.id
-      eventData.you_name = reqBody.you.name
-      eventData.you_health = reqBody.you.health
-      eventData.you_length = reqBody.you.length
-      eventData.you_shout = reqBody.you.shout
-      eventData.you_squad = reqBody.you.squad
-      eventData.you_latency = reqBody.you.latency
-      eventData.you_head_x = reqBody.you.head.x
-      eventData.you_head_y = reqBody.you.head.y
-
       const res = new Response('OK', { status: 200 }) // eslint-disable-line
       eventData.res_status = res.status
       event.waitUntil(postLog(eventData))
-      // no response required
       return res
     } else {
       const res = new Response('Not Found', { status: 404 }) // eslint-disable-line
