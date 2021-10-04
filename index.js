@@ -248,15 +248,15 @@ if (isCloudFlareWorker) {
       return res
     }
   }
-
-  function postLog (data) {
-    console.log('sending event to honeycomb')
-    return fetch('https://api.honeycomb.io/1/events/' + encodeURIComponent(HONEYCOMB_DATASET), { // eslint-disable-line
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: new Headers([['X-Honeycomb-Team', HONEYCOMB_KEY]]) // eslint-disable-line
-    })
-  }
 } else {
   module.exports = { move }
+}
+
+function postLog (data) {
+  console.log('sending event to honeycomb')
+  return fetch('https://api.honeycomb.io/1/events/' + encodeURIComponent(HONEYCOMB_DATASET), { // eslint-disable-line
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: new Headers([['X-Honeycomb-Team', HONEYCOMB_KEY]]) // eslint-disable-line
+  })
 }
