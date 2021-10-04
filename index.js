@@ -127,6 +127,8 @@ if (isCloudFlareWorker) {
         version: '2021-07-07'
       }
 
+      eventData.res_status = 200
+
       event.waitUntil(postLog(eventData))
 
       return new Response(JSON.stringify(body), { // eslint-disable-line
@@ -138,6 +140,8 @@ if (isCloudFlareWorker) {
     }
 
     if (request.method !== 'POST') {
+
+      eventData.res_status = 404
       event.waitUntil(postLog(eventData))
       return new Response('Not Found', { status: 404 }) // eslint-disable-line
     }
@@ -168,6 +172,7 @@ if (isCloudFlareWorker) {
       eventData.you_head_y = reqBody.you.head.y
 
       // no response required
+      eventData.res_status = 200
       event.waitUntil(postLog(eventData))
       return new Response('OK', { status: 200 }) // eslint-disable-line
 
@@ -201,6 +206,7 @@ if (isCloudFlareWorker) {
       eventData.res_move = resBody.move
       eventData.res_shout = resBody.shout
 
+      eventData.res_status = 200
       event.waitUntil(postLog(eventData))
 
       return new Response(JSON.stringify(resBody), { // eslint-disable-line
@@ -237,10 +243,12 @@ if (isCloudFlareWorker) {
       eventData.you_head_x = reqBody.you.head.x
       eventData.you_head_y = reqBody.you.head.y
 
-      // no response required
+      eventData.res_status = 200
       event.waitUntil(postLog(eventData))
+      // no response required
       return new Response('OK', { status: 200 }) // eslint-disable-line
     } else {
+      eventData.res_status = 404
       event.waitUntil(postLog(eventData))
       return new Response('Not Found', { status: 404 }) // eslint-disable-line
     }
