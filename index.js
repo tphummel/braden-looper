@@ -118,10 +118,11 @@ if (isCloudFlareWorker) {
     const { request } = event
     const { pathname } = new URL(request.url)
     
+    console.log(request.method, request.pathname)
+
     let eventData = getEventData(event)
 
     if (request.method === 'GET') {
-      console.log('GET /')
       console.log(new Map(request.headers))
 
       const body = {
@@ -153,7 +154,6 @@ if (isCloudFlareWorker) {
     }
 
     if (pathname.startsWith('/start')) {
-      console.log('POST /start')
       console.log(new Map(request.headers))
 
       const reqBodyTxt = await request.text()
@@ -183,9 +183,6 @@ if (isCloudFlareWorker) {
       return new Response('OK', { status: 200 }) // eslint-disable-line
 
     } else if (pathname.startsWith('/move')) {
-      console.log('POST /move')
-      console.log(new Map(request.headers))
-
       const reqBodyTxt = await request.text()
       const reqBody = JSON.parse(reqBodyTxt)
 
@@ -222,7 +219,6 @@ if (isCloudFlareWorker) {
         }
       })
     } else if (pathname.startsWith('/end')) {
-      console.log('POST /end')
       console.log(new Map(request.headers))
 
       const reqBodyTxt = await request.text()
