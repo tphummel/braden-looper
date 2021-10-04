@@ -85,37 +85,68 @@ function move (reqBody) {
 
 const isCloudFlareWorker = typeof addEventListener !== 'undefined' && addEventListener // eslint-disable-line
 
+function getEventData (event) {
+  const { pathname } = new URL(event.request.url)
+  const cf = event.request.cf !== undefined ? event.request.cf : {}
+  const headers = new Map(event.request.headers)
+
+  return {
+    battlesnake: BATTLESNAKE_NAME, // eslint-disable-line
+    req_method: event.request.method,
+    req_pathname: pathname,
+    req_lat: cf.latitude,
+    req_lon: cf.longitude,
+    req_continent: cf.continent,
+    req_country: cf.country,
+    req_region: cf.region,
+    req_city: cf.city,
+    req_timezone: cf.timezone,
+    req_region_code: cf.regionCode,
+    req_metro_code: cf.metroCode,
+    req_postal_code: cf.postalCode,
+    req_colo: cf.colo,
+    req_cf_ray: headers.get('cf-ray')
+  }
+}
+
 if (isCloudFlareWorker) {
   addEventListener('fetch', event => { // eslint-disable-line
     event.respondWith(handleRequest(event))
   })
 
+  function mergeReqEvent (eventData, reqBody) {
+    eventData.game_id = reqBody.game.id
+    eventData.game_timeout = reqBody.game.timeout
+    eventData.game_source = reqBody.game?.source
+    eventData.ruleset_name = reqBody.game?.ruleset?.name
+    eventData.ruleset_version = reqBody.game?.ruleset?.version
+    eventData.turn = reqBody.turn
+    eventData.board_height = reqBody.board.height
+    eventData.board_width = reqBody.board.width
+    eventData.board_food_count = reqBody.board.food?.length
+    eventData.board_hazard_count = reqBody.board.hazards?.length
+    eventData.board_snakes_count = reqBody.board.snakes?.length
+    eventData.you_id = reqBody.you.id
+    eventData.you_name = reqBody.you.name
+    eventData.you_health = reqBody.you.health
+    eventData.you_length = reqBody.you.length
+    eventData.you_shout = reqBody.you.shout
+    eventData.you_squad = reqBody.you.squad
+    eventData.you_latency = reqBody.you.latency
+    eventData.you_head_x = reqBody.you.head.x
+    eventData.you_head_y = reqBody.you.head.y
+
+    return eventData
+  }
+
   async function handleRequest (event) {
     const { request } = event
     const { pathname } = new URL(request.url)
-    const cf = event.request.cf !== undefined ? event.request.cf : {}
-    const headers = new Map(request.headers)
 
-    const eventData = {
-      battlesnake: BATTLESNAKE_NAME, // eslint-disable-line
-      req_method: event.request.method,
-      req_pathname: pathname,
-      req_lat: cf.latitude,
-      req_lon: cf.longitude,
-      req_continent: cf.continent,
-      req_country: cf.country,
-      req_region: cf.region,
-      req_city: cf.city,
-      req_timezone: cf.timezone,
-      req_region_code: cf.regionCode,
-      req_metro_code: cf.metroCode,
-      req_postal_code: cf.postalCode,
-      req_colo: cf.colo,
-      req_cf_ray: headers.get('cf-ray')
-    }
+    console.log(request.method, request.pathname)
+    let eventData = getEventData(event)
 
     if (request.method === 'GET') {
-      console.log('GET /')
       console.log(new Map(request.headers))
 
       const body = {
@@ -127,133 +158,62 @@ if (isCloudFlareWorker) {
         version: '2021-07-07'
       }
 
-      event.waitUntil(postLog(eventData))
-
-      return new Response(JSON.stringify(body), { // eslint-disable-line
+      const res = new Response(JSON.stringify(body), { // eslint-disable-line
         status: 200,
         headers: {
           'content-type': 'application/json;charset=UTF-8'
         }
       })
+
+      eventData.res_status = res.status
+      event.waitUntil(postLog(eventData))
+      return res
     }
 
     if (request.method !== 'POST') {
+      const res = new Response('Not Found', { status: 404 }) // eslint-disable-line
+      eventData.res_status = res.status
       event.waitUntil(postLog(eventData))
-      return new Response('Not Found', { status: 404 }) // eslint-disable-line
+      return res
     }
 
+    const reqBodyTxt = await request.text()
+    const reqBody = JSON.parse(reqBodyTxt)
+    eventData = mergeReqEvent(eventData, reqBody)
+    let res
+
     if (pathname.startsWith('/start')) {
-      console.log('POST /start')
-      console.log(new Map(request.headers))
-
-      const reqBodyTxt = await request.text()
-      const reqBody = JSON.parse(reqBodyTxt)
-
-      eventData.game_id = reqBody.game.id
-      eventData.game_timeout = reqBody.game.timeout
-      eventData.turn = reqBody.turn
-      eventData.board_height = reqBody.board.height
-      eventData.board_width = reqBody.board.width
-      eventData.board_food_count = reqBody.board.food.length
-      eventData.board_hazard_count = reqBody.board.hazards.length
-      eventData.board_snakes_count = reqBody.board.snakes.length
-      eventData.you_id = reqBody.you.id
-      eventData.you_name = reqBody.you.name
-      eventData.you_health = reqBody.you.health
-      eventData.you_length = reqBody.you.length
-      eventData.you_shout = reqBody.you.shout
-      eventData.you_squad = reqBody.you.squad
-      eventData.you_latency = reqBody.you.latency
-      eventData.you_head_x = reqBody.you.head.x
-      eventData.you_head_y = reqBody.you.head.y
-
-      // no response required
-      event.waitUntil(postLog(eventData))
-      return new Response('OK', { status: 200 }) // eslint-disable-line
-
+      res = new Response('OK', { status: 200 }) // eslint-disable-line
     } else if (pathname.startsWith('/move')) {
-      console.log('POST /move')
-      console.log(new Map(request.headers))
-
-      const reqBodyTxt = await request.text()
-      const reqBody = JSON.parse(reqBodyTxt)
-
-      eventData.game_id = reqBody.game.id
-      eventData.game_timeout = reqBody.game.timeout
-      eventData.turn = reqBody.turn
-      eventData.board_height = reqBody.board.height
-      eventData.board_width = reqBody.board.width
-      eventData.board_food_count = reqBody.board.food.length
-      eventData.board_hazard_count = reqBody.board.hazards.length
-      eventData.board_snakes_count = reqBody.board.snakes.length
-      eventData.you_id = reqBody.you.id
-      eventData.you_name = reqBody.you.name
-      eventData.you_health = reqBody.you.health
-      eventData.you_length = reqBody.you.length
-      eventData.you_shout = reqBody.you.shout
-      eventData.you_squad = reqBody.you.squad
-      eventData.you_latency = reqBody.you.latency
-      eventData.you_head_x = reqBody.you.head.x
-      eventData.you_head_y = reqBody.you.head.y
-
       const resBody = move(reqBody)
-
       eventData.res_move = resBody.move
       eventData.res_shout = resBody.shout
 
-      event.waitUntil(postLog(eventData))
-
-      return new Response(JSON.stringify(resBody), { // eslint-disable-line
+      res = new Response(JSON.stringify(resBody), { // eslint-disable-line
         status: 200,
         headers: {
           'content-type': 'application/json;charset=UTF-8'
         }
       })
     } else if (pathname.startsWith('/end')) {
-      console.log('POST /end')
-      console.log(new Map(request.headers))
-
-      const reqBodyTxt = await request.text()
-      const reqBody = JSON.parse(reqBodyTxt)
-
-      eventData.game_id = reqBody.game.id
-      eventData.game_timeout = reqBody.game.timeout
-      eventData.game_source = reqBody.game.source
-      eventData.ruleset_name = reqBody.game.ruleset.name
-      eventData.ruleset_version = reqBody.game.ruleset.version
-      eventData.turn = reqBody.turn
-      eventData.board_height = reqBody.board.height
-      eventData.board_width = reqBody.board.width
-      eventData.board_food_count = reqBody.board.food.length
-      eventData.board_hazard_count = reqBody.board.hazards.length
-      eventData.board_snakes_count = reqBody.board.snakes.length
-      eventData.you_id = reqBody.you.id
-      eventData.you_name = reqBody.you.name
-      eventData.you_health = reqBody.you.health
-      eventData.you_length = reqBody.you.length
-      eventData.you_shout = reqBody.you.shout
-      eventData.you_squad = reqBody.you.squad
-      eventData.you_latency = reqBody.you.latency
-      eventData.you_head_x = reqBody.you.head.x
-      eventData.you_head_y = reqBody.you.head.y
-
-      // no response required
-      event.waitUntil(postLog(eventData))
-      return new Response('OK', { status: 200 }) // eslint-disable-line
+      res = new Response('OK', { status: 200 }) // eslint-disable-line
     } else {
-      event.waitUntil(postLog(eventData))
-      return new Response('Not Found', { status: 404 }) // eslint-disable-line
+      res = new Response('Not Found', { status: 404 }) // eslint-disable-line
     }
-  }
 
-  function postLog (data) {
-    console.log('sending event to honeycomb')
-    return fetch('https://api.honeycomb.io/1/events/' + encodeURIComponent(HONEYCOMB_DATASET), { // eslint-disable-line
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: new Headers([['X-Honeycomb-Team', HONEYCOMB_KEY]]) // eslint-disable-line
-    })
+    eventData.res_status = res.status
+    event.waitUntil(postLog(eventData))
+    return res
   }
 } else {
   module.exports = { move }
+}
+
+function postLog (data) {
+  console.log('sending event to honeycomb')
+  return fetch('https://api.honeycomb.io/1/events/' + encodeURIComponent(HONEYCOMB_DATASET), { // eslint-disable-line
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: new Headers([['X-Honeycomb-Team', HONEYCOMB_KEY]]) // eslint-disable-line
+  })
 }
