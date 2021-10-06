@@ -106,7 +106,7 @@ if (isCloudFlareWorker) {
         color: '#888888',
         head: 'viper',
         tail: 'rattle',
-        version: '2021-07-07'
+        version: SNAKE_VERSION // eslint-disable-line
       }
 
       const res = new Response(JSON.stringify(body), { // eslint-disable-line
